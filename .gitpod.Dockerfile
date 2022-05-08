@@ -23,8 +23,3 @@ RUN cd /tmp && sudo make -C ./linux-5.17.5 headers_install INSTALL_HDR_PATH=/usr
 RUN cd /tmp && sudo make -C ./linux-5.17.5/tools/lib/bpf install INSTALL_HDR_PATH=/usr
 RUN cd /tmp && sudo make -C ./linux-5.17.5/tools/bpf/bpftool install
 RUN sudo rm -rf /tmp
-
-RUN sudo apt-get remove -y \
-  autoconf bison cmake dkms flex gawk gcc python3 rsync \
-  libiberty-dev libncurses-dev libpci-dev libssl-dev libudev-dev \
-  && sudo apt autoremove -y \
