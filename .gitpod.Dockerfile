@@ -1,7 +1,5 @@
 FROM gitpod/workspace-full
 
-RUN DEBIAN_FRONTEND=noninteractive sudo apt-get update
-RUN DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y
 # install dependencies and tools
 RUN DEBIAN_FRONTEND=noninteractive sudo install-packages\
   ca-certificates\
@@ -19,7 +17,7 @@ RUN DEBIAN_FRONTEND=noninteractive sudo install-packages\
   libiberty-dev libncurses-dev libpci-dev libssl-dev libudev-dev
 
 RUN cd /tmp && curl https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.17.5.tar.gz | tar -xz
-RUN cd /tmp && sudo make -C ./linux-5.17.5 headers_install INSTALL_HDR_PATH=/usr
-RUN cd /tmp && sudo make -C ./linux-5.17.5/tools/lib/bpf install INSTALL_HDR_PATH=/usr
-RUN cd /tmp && sudo make -C ./linux-5.17.5/tools/bpf/bpftool install
-RUN sudo rm -rf /tmp
+RUN sudo make -C /tmp/linux-5.17.5 headers_install INSTALL_HDR_PATH=/usr
+RUN sudo make -C /tmp/linux-5.17.5/tools/lib/bpf install INSTALL_HDR_PATH=/usr
+RUN sudo make -C /tmp/linux-5.17.5/tools/bpf/bpftool install
+RUN sudo rm -rf /tmp/linux-5.17.5
