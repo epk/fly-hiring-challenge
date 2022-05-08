@@ -37,28 +37,4 @@ ENV GOPATH="/go"
 ENV PATH="/usr/local/go/bin:$GOPATH/bin:$PATH" 
 
 RUN curl -L https://go.dev/dl/go1.18.linux-amd64.tar.gz | tar -xz -C /usr/local;
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-
-# configure sshd
-RUN mkdir /run/sshd; \
-  sed -i 's/^#\(PermitRootLogin\) .*/\1 yes/' /etc/ssh/sshd_config; \
-  sed -i 's/^\(UsePAM yes\)/# \1/' /etc/ssh/sshd_config;
-
-# entrypoint
-RUN { \
-  echo '#!/bin/bash -eu'; \
-  echo 'ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime'; \
-  echo 'echo "root:${ROOT_PASSWORD}" | chpasswd'; \
-  echo 'exec "$@"'; \
-  } > /usr/local/bin/entry_point.sh; \
-  chmod +x /usr/local/bin/entry_point.sh;
-
-ENV TZ=UTC
-
-ENV ROOT_PASSWORD root
-
-EXPOSE 22
-
-ENTRYPOINT ["entry_point.sh"]
-CMD    ["/usr/sbin/sshd", "-D", "-e", "-p", "2222"]
-
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" "$GOPATH/pkg" && chmod -R 777 "$GOPATH"
