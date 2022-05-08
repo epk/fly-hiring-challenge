@@ -1,23 +1,25 @@
-app = "platform-work-sample-codeserver"
+# fly.toml file generated for fly-hiring-challenge on 2022-05-08T23:05:59-07:00
 
-kill_signal  = "SIGINT"
+app = "fly-hiring-challenge"
+
+kill_signal = "SIGINT"
 kill_timeout = 5
-processes    = []
+processes = []
 
 [env]
 
-[mounts]
-source      = "data"
-destination = "/root"
-
 [experimental]
-allowed_public_ports = []
-auto_rollback        = true
+  allowed_public_ports = []
+  auto_rollback = true
+
+[mounts]
+  destination = "/root"
+  source = "data"
 
 [[services]]
-internal_port = 2222
-protocol      = "tcp"
-script_checks = []
+  internal_port = 2222
+  protocol = "tcp"
+  script_checks = []
 
   [[services.ports]]
-  port = 2222
+    port = 2222

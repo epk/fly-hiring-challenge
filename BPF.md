@@ -11,7 +11,7 @@ You'll need the following tools and libraries installed:
   - `libbpf` source code, which you can get from Github, because it has a recent `bpf_helper_defs.h` with `bpf_sk_assign` in it, which you need to make this program work.
   - clang>10 to generate ELF .o's that new bpftool will load from.
 
-If you're using something like Ubuntu, the `bpftool` and `libppf-dev` packages aren't compiled for the right version before 21.01. In this case you'll need to build and install from kernel sources. 
+If you're using something like Ubuntu, the `bpftool` and `libppf-dev` packages aren't compiled for the right version before 21.01. In this case you'll need to build and install from kernel sources.
 
 ### Fly.io Dev Server
 
@@ -27,9 +27,9 @@ Once your VM is deployed, you should be able to access it at `ssh://root:<someth
 ### Starting points:
 
 - Check out this presentation: https://ebpf.io/summit-2020-slides/eBPF_Summit_2020-Lightning-Jakub_Sitnicki-Steering_connections_to_sockets_with_BPF_socke_lookup_hook.pdf
-- Interacting with eBPF from Go: 
+- Interacting with eBPF from Go:
 
-### 
+###
 
 There are exotic ways to build BPF programs. Those are fine if you'd like, but C code complied with clang works just fine. Here's an example Makefile:
 
@@ -56,7 +56,7 @@ $ bpftool prog show pinned /sys/fs/bpf/proxy_dispatch_prog
         xlated 272B  jited 155B  memlock 4096B  map_ids 4,5
 ```
 
-The goal of the sk_lookup hook is to assign incoming connections to sockets. You tell the BPF program which socket to attach to with a `BPF_MAP_TYPE_SOCKMAP` map, which for you will be a 1-entry map, keys `uint32_t`, values `uint64_t`. You'll tell the BPF program which ports are open with a `BPF_MAP_TYPE_HASH` map with `uint16_t` keys for ports, and empty `uint8_t` for the value. 
+The goal of the sk_lookup hook is to assign incoming connections to sockets. You tell the BPF program which socket to attach to with a `BPF_MAP_TYPE_SOCKMAP` map, which for you will be a 1-entry map, keys `uint32_t`, values `uint64_t`. You'll tell the BPF program which ports are open with a `BPF_MAP_TYPE_HASH` map with `uint16_t` keys for ports, and empty `uint8_t` for the value.
 
 When your target program loads, you'll want it to:
 1. load the BPF `BPF_MAP_TYPE_SOCKMAP`

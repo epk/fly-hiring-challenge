@@ -2,50 +2,54 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 
+	"github.com/cilium/ebpf"
+	"github.com/cilium/ebpf/features"
+	"github.com/cilium/ebpf/rlimit"
 	"github.com/fly-hiring/platform-challenge/pkg/config"
+	"github.com/fly-hiring/platform-challenge/pkg/tcpproxy"
 )
 
 func main() {
-	ctx := newCancelableContext()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
 	cfgStore := config.NewConfigStore("./config.json")
 
-	// watch for changes to the config
-	ch, err := cfgStore.StartWatcher()
-	if err != nil {
+	var proxy *tcpproxy.TCPProxy
+
+	if err := features.HaveProgType(ebpf.SkLookup); err == nil {
+		log.Println("SK_LOOKUP is supported, using eBPF mode")
+		if err := rlimit.RemoveMemlock(); err != nil {
+			log.Fatal(err)
+		}
+
+		// Start TCPProxy with eBPF mode
+		proxy, err = tcpproxy.New(ctx, cfgStore, true)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	} else {
+		log.Println("SK_LOOKUP is not supported, using native mode")
+
+		// Start TCPProxy with native mode
+		proxy, err = tcpproxy.New(ctx, cfgStore, false)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if err := proxy.Listen(ctx); err != nil {
 		log.Fatalln(err)
 	}
-	defer cfgStore.Close()
-
-	go func() {
-		for cfg := range ch {
-			fmt.Println("got config change:", cfg)
-		}
-	}()
-
-	// TODO: put a proxy here :)
 
 	<-ctx.Done()
-}
 
-// newCancelableContext returns a context that gets canceled by a SIGINT
-func newCancelableContext() context.Context {
-	doneCh := make(chan os.Signal, 1)
-	signal.Notify(doneCh, os.Interrupt)
-
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-
-	go func() {
-		<-doneCh
-		log.Println("signal recieved")
-		cancel()
-	}()
-
-	return ctx
+	if err := proxy.Close(); err != nil {
+		log.Fatalln(err)
+	}
 }

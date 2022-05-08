@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "Brewfile": "plaintext",
+    "*.yml.erb": "yaml",
+    "bpf_helpers.h": "c"
+  }
+}

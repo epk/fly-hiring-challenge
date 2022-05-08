@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -86,7 +86,7 @@ func (c ConfigStore) Read() (Config, error) {
 
 func readConfigFile(path string) (Config, error) {
 	var cfg Config
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return cfg, fmt.Errorf("error reading config file: %w", err)
 	}
